@@ -6,11 +6,17 @@ from typing import List
 import re
 
 
+def getPattern(message: str, pattern: str, separator: str) -> str:
+    """ gets pattern needed to substitute """
+    regex = r'{}=(.*){}.*'.format(pattern, separator)
+    spot = re.findall(regex, message)
+    return spot[0].split(separator)[0]
+
+
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
     """ returns the log message obfuscated """
     for field in fields:
-        regex = r'{}=(.*){}.*'.format(field, separator)
-        spot = re.findall(regex, message)
-        message = re.sub(spot[0].split(separator)[0], redaction, message)
+        pat = getPattern(message, field, separator)
+        message = re.sub(pat, redaction, message)
     return message
