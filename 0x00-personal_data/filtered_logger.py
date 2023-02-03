@@ -8,9 +8,11 @@ import re
 
 def getPattern(message: str, pattern: str, separator: str) -> str:
     """ gets pattern needed to substitute """
-    regex = r'{}=(.*){}.*'.format(pattern, separator)
-    spot = re.findall(regex, message)
-    return spot[0].split(separator)[0]
+    spli_list = message.split(separator)
+    for item in spli_list:
+        if pattern in item:
+            return item[item.index('=') + 1:]
+        return ''
 
 
 def filter_datum(fields: List[str], redaction: str,
