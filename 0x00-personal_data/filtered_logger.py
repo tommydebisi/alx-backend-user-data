@@ -13,6 +13,7 @@ def get_logger() -> logging.Logger:
     """ returns the log obj """
     logger = logging.getLogger('user_data')
     logger.setLevel(logging.INFO)
+    logger.propagate = True
 
     stream = logging.StreamHandler()
     formatt = RedactingFormatter(PII_FIELDS)
