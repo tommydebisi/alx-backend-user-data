@@ -69,6 +69,7 @@ def main() -> None:
     connect = get_db()
     cursor = connect.cursor()
 
+    logger = get_logger()
     cols = ['name', 'email', 'phone', 'ssn',
             'password', 'ip', 'last_login', 'user_agent']
     cursor.execute('SELECT * FROM users;')
@@ -76,10 +77,7 @@ def main() -> None:
         message = ""
         for name, val in zip(cols, row):
             message += '{}={};'.format(name, val)
-        log = logging.LogRecord(get_logger().name, logging.INFO,
-                                None, None, message, None, None)
-        formatt = RedactingFormatter(PII_FIELDS)
-        print(formatt.format(log))
+        logger.info(message)
 
     cursor.close()
     connect.close()
