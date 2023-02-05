@@ -13,11 +13,10 @@ def get_logger() -> logging.Logger:
     """ returns the log obj """
     logger = logging.getLogger('user_data')
     logger.setLevel(logging.INFO)
-    logger.propagate = True
+    logger.propagate = False  # this logger is the root logger
 
     stream = logging.StreamHandler()
-    formatt = RedactingFormatter(PII_FIELDS)
-    stream.sefFormatter(formatt)
+    stream.setFormatter(RedactingFormatter(PII_FIELDS))
     logger.addHandler(stream)
     return logger
 
