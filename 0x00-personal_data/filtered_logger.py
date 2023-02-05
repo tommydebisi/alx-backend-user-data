@@ -62,3 +62,28 @@ class RedactingFormatter(logging.Formatter):
                                 record.getMessage(), self.SEPARATOR)
         record.msg = filtered
         return super().format(record)
+
+
+def main() -> None:
+    """ filters rows from the db """
+    connect = get_db()
+    cursor = connect.cursor()
+
+    cols = ['name', 'email', 'phone', 'ssn',
+            'password', 'ip', 'last_login', 'user_agent']
+    cursor.execute('SELECT * FROM users;')
+    for row in cursor:
+        message = ""
+        for name, val in zip(cols, row):
+            message += '{}={};'.format(name, val)
+        log = logging.LogRecord(get_logger().name, logging.INFO,
+                                None, None, message, None, None)
+        formatt = RedactingFormatter(PII_FIELDS)
+        print(formatt.format(log))
+
+    cursor.close()
+    connect.close()
+
+
+if __name__ == "__main__":
+    main()
