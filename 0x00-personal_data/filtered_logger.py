@@ -5,8 +5,25 @@
 from typing import List
 import re
 import logging
+import mysql.connector
+from os import getenv
 
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """ returns a connector to the database """
+    user = getenv('PERSONAL_DATA_DB_USERNAME')
+    user = user if user else 'root'
+
+    passwd = getenv('PERSONAL_DATA_DB_PASSWORD')
+    passwd = passwd if passwd else ''
+
+    host = getenv('PERSONAL_DATA_DB_HOST')
+    host = host if host else 'localhost'
+    db = 'my_db'
+    return mysql.connector.connect(host=host, password=passwd,
+                                   user=user, database=db)
 
 
 def get_logger() -> logging.Logger:
@@ -15,6 +32,7 @@ def get_logger() -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.propagate = False  # this logger is the root logger
 
+    # provide where to log the output to
     stream = logging.StreamHandler()
     stream.setFormatter(RedactingFormatter(PII_FIELDS))
     logger.addHandler(stream)
