@@ -6,7 +6,7 @@ from typing import List
 import re
 import logging
 
-PII_FIELDS = ('email', 'phone', 'ssn', 'password', 'ip')
+PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
 
 
 def get_logger() -> logging.Logger:
@@ -14,8 +14,10 @@ def get_logger() -> logging.Logger:
     logger = logging.getLogger('user_data')
     logger.setLevel(logging.INFO)
 
-    log = logging.StreamHandler(RedactingFormatter(PII_FIELDS))
-    logger.addHandler(log)
+    stream = logging.StreamHandler()
+    formatt = RedactingFormatter(PII_FIELDS)
+    stream.sefFormatter(formatt)
+    logger.addHandler(stream)
     return logger
 
 
@@ -37,7 +39,7 @@ class RedactingFormatter(logging.Formatter):
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
 
-    def __init__(self, fields: List[str]) -> None:
+    def __init__(self, fields: List[str]):
         self.fields = fields
         super(RedactingFormatter, self).__init__(self.FORMAT)
 
