@@ -24,7 +24,10 @@ class Auth:
         for strr in excluded_paths:
             if strr.endswith('*'):
                 spl_ex = strr.split('/')[-1]
-                spl_path = path.split('/')[-1]
+
+                # check for ending with '/' and not ending with '/'
+                spl_path = path.split('/')[-1] if not path.endswith('/') \
+                    else path.split('/')[-2]
 
                 if spl_path.startswith(spl_ex[:-1]):
                     return False
