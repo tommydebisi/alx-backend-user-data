@@ -6,7 +6,7 @@ from api.v1.auth.auth import Auth
 import base64
 from typing import Tuple, TypeVar
 from models.user import User
-
+from models.base import DATA
 
 class BasicAuth(Auth):
     """
@@ -75,6 +75,10 @@ class BasicAuth(Auth):
             return None
 
         if user_pwd is None or type(user_pwd) != str:
+            return None
+
+        # check if db is empty
+        if not DATA:
             return None
 
         # can only search for email as password gets encrypted
