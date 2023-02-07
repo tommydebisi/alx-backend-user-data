@@ -5,6 +5,7 @@
 from api.v1.auth.auth import Auth
 import base64
 from typing import Tuple, TypeVar
+from models.user import User
 
 
 class BasicAuth(Auth):
@@ -75,3 +76,38 @@ class BasicAuth(Auth):
 
         if user_pwd is None or type(user_pwd) != str:
             return None
+
+        if User.count() == 0:
+            return None
+
+        # can only search for email as password gets encrypted
+        user_inst = User.search({"email": user_email})
+        if not user_inst:
+            return None
+
+        # check for the correct password
+        if not user_inst[0].is_valid_password(user_pwd):
+            return None
+
+        return user_inst[0]
+
+    def current_user(self, request=None) -> TypeVar('User'):
+        """
+            Returns the user instance for a request passed
+        """
+        bas_auth = BasicAuth()
+
+        # Get the authorization header content
+        author_header = bas_auth.authorization_header(request)
+
+        # Extract the base64 encoded string
+        ext_st = bas_auth.extract_base64_authorization_header(author_header)
+
+        # Decode the encoded string extracted
+        decoded_b64 = bas_auth.decode_base64_authorization_header(ext_st)
+
+        # Get user email and password from decoded_b64 string
+        email, passwd = bas_auth.extract_user_credentials(decoded_b64)
+
+        # Get the user instance with user email and password gotten
+        return bas_auth.user_object_from_credentials(email, passwd)
