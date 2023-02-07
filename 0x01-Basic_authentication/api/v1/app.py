@@ -30,7 +30,7 @@ def before_req() -> None:
     if not auth:
         return
 
-    ex_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
+    ex_paths = ['/api/v1/stat*', '/api/v1/unauthorized/',
                 '/api/v1/forbidden/']
 
     # check if path is part of the excluded paths and do nothing
