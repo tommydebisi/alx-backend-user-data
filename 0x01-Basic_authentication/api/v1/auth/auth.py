@@ -21,9 +21,13 @@ class Auth:
         if path in excluded_paths or path[:-1] in excluded_paths:
             return False
 
-        if f'{path}/' in excluded_paths or f'{path[:-1]}*' in excluded_paths \
-                or f'{path[:-2]}*' in excluded_paths:
-            return False
+        for strr in excluded_paths:
+            if strr.endswith('*'):
+                spl_ex = strr.split('/')[-1]
+                spl_path = path.split('/')[-1]
+
+                if spl_path.startswith(spl_ex[:-1]):
+                    return False
 
         return True
 
