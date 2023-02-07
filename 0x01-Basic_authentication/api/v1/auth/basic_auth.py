@@ -8,6 +8,7 @@ from typing import Tuple, TypeVar
 from models.user import User
 from models.base import DATA
 
+
 class BasicAuth(Auth):
     """
         Basic Authentication Class
