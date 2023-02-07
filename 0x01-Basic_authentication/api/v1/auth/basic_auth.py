@@ -64,7 +64,7 @@ class BasicAuth(Auth):
             return (None, None)
 
         user_pass = decoded_base64_authorization_header.split(':')
-        return tuple(user_pass)
+        return (user_pass[0], ':'.join(user_pass[1:]))
 
     def user_object_from_credentials(self, user_email: str, user_pwd: str
                                      ) -> TypeVar('User'):
@@ -75,9 +75,6 @@ class BasicAuth(Auth):
             return None
 
         if user_pwd is None or type(user_pwd) != str:
-            return None
-
-        if User.count() == 0:
             return None
 
         # can only search for email as password gets encrypted
