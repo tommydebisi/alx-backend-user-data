@@ -18,6 +18,9 @@ class Auth:
         if not path:
             return True
 
+        if not excluded_paths:
+            return True
+
         if path in excluded_paths or path[:-1] in excluded_paths:
             return False
 
