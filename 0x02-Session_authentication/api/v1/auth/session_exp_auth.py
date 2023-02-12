@@ -12,9 +12,11 @@ class SessionExpAuth(SessionAuth):
         Session Expiration class
     """
     def __init__(self) -> None:
+        """ constructor func """
         self.session_duration = int(getenv('SESSION_DURATION', 0))
 
     def create_session(self, user_id: str = None) -> str:
+        """ returns session id and set value of user id and current to it """
         ses_id = super().create_session(user_id)
         if ses_id is None:
             return None
