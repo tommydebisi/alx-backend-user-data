@@ -2,7 +2,10 @@
 """
     auth module
 """
+from db import DB, User
 from bcrypt import hashpw, gensalt
+from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm.exc import NoResultFound
 
 
 def _hash_password(password: str) -> bytes:
@@ -11,3 +14,23 @@ def _hash_password(password: str) -> bytes:
     """
     encoded_pass = password.encode('utf-8')
     return hashpw(encoded_pass, gensalt())
+
+
+class Auth:
+    """Auth class to interact with the authentication database.
+    """
+
+    def __init__(self):
+        self._db = DB()
+
+    def register_user(self, email: str, password: str) -> User:
+        """
+            takes user's email and password and returns the
+            user instance associated with it
+        """
+        try:
+            if self._db.find_user_by(email=email):
+                raise ValueError(f"User {email} already exists")
+        except (InvalidRequestError, NoResultFound):
+            hashed_pass = _hash_password(password)
+            return self._db.add_user(email, hashed_pass)
