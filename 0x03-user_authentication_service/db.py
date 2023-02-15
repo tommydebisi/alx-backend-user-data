@@ -5,6 +5,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import InvalidRequestError
 
 from user import Base, User
 
@@ -39,3 +41,17 @@ class DB:
         self._session.add(user_inst)
         self._session.commit()
         return user_inst
+
+    def find_user_by(self, **kwargs) -> User:
+        """
+            searches and gets the user by the value passed from kwargs
+            and return the first row
+        """
+        # check if kwarg is in the user dict
+        if list(kwargs.keys())[0] not in list(User.__dict__.keys()):
+            raise InvalidRequestError
+
+        row = self._session.query(User).filter_by(**kwargs).first()
+        if not row:
+            raise NoResultFound
+        return row
