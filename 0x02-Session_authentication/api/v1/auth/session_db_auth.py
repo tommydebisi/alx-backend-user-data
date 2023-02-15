@@ -5,6 +5,7 @@
 from api.v1.auth.session_exp_auth import SessionExpAuth, request
 from models.user_session import UserSession
 from datetime import timedelta, datetime
+from uuid import uuid4
 
 
 class SessionDBAuth(SessionExpAuth):
@@ -16,7 +17,10 @@ class SessionDBAuth(SessionExpAuth):
         """
             creates and returns a new session id with expiration date
         """
-        ses_id = super().create_session(user_id)
+        if user_id is None or type(user_id) != str:
+            return None
+
+        ses_id = str(uuid4())
 
         user_session_dic = {
             "user_id": user_id,
@@ -56,5 +60,4 @@ class SessionDBAuth(SessionExpAuth):
         if not user_obj[0]:
             return False
 
-        del self.user_id_by_session_id[ses_id]
         user_obj[0].remove()
