@@ -55,3 +55,18 @@ class DB:
         if not row:
             raise NoResultFound
         return row
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """
+            Updates user with user_id with the key-value provided
+            in kwargs
+        """
+        # find user by id first
+        user_inst = self.find_user_by(id=user_id)
+
+        for key, val in kwargs.items():
+            if list(kwargs.keys())[0] not in list(user_inst.__dict__.keys()):
+                raise ValueError
+
+            user_inst.__dict__[key] = val
+            self.__session.commit()
