@@ -54,3 +54,17 @@ class Auth:
                            usr_inst.hashed_password.encode('utf-8'))
         except (InvalidRequestError, NoResultFound):
             return False
+
+    def create_session(self, email: str) -> str:
+        """
+            gets a user affiliated with email, stores the unique
+            session id to the database and return it
+        """
+        try:
+            usr_inst = self._db.find_user_by(email=email)
+        except (InvalidRequestError, NoResultFound):
+            return None
+
+        ses_id = _generate_uuid()
+        self._db.update_user(usr_inst.id, session_id=ses_id)
+        return ses_id
