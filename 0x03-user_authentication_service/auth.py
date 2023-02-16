@@ -6,6 +6,7 @@ from db import DB, User
 from bcrypt import hashpw, gensalt, checkpw
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
+from uuid import uuid4
 
 
 def _hash_password(password: str) -> bytes:
@@ -16,9 +17,16 @@ def _hash_password(password: str) -> bytes:
     return hashpw(encoded_pass, gensalt())
 
 
+def _generate_uuid() -> str:
+    """
+        generates a new unique string id
+    """
+    return str(uuid4())
+
+
 class Auth:
     """Auth class to interact with the authentication database.
-    """
+        """
 
     def __init__(self):
         self._db = DB()
