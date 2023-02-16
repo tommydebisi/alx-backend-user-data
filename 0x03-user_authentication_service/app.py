@@ -2,7 +2,7 @@
 """
     App module
 """
-from flask import Flask, jsonify, request as rq, abort
+from flask import Flask, jsonify, request as rq, abort, redirect
 from auth import Auth
 
 app = Flask(__name__)
@@ -31,20 +31,41 @@ def reg_user():
         return jsonify({"message": "email already registered"}), 400
 
 
-@app.route('/sessions', methods=['POST'], strict_slashes=False)
+@app.route('/sessions', methods=['POST', 'DELETE'], strict_slashes=False)
 def login():
     """
         Login users
     """
-    email, passwd = rq.form.get('email'), rq.form.get('password')
+    if rq.method == 'POST':
+        email, passwd = rq.form.get('email'), rq.form.get('password')
 
-    if not auth.valid_login(email, passwd):
-        abort(401)
+        if not auth.valid_login(email, passwd):
+            abort(401)
 
-    ses_id = auth.create_session(email)
-    payload = jsonify({"email": email, "message": "logged in"})
-    payload.set_cookie('session_id', ses_id)
-    return payload
+        ses_id = auth.create_session(email)
+        payload = jsonify({"email": email, "message": "logged in"})
+        payload.set_cookie('session_id', ses_id)
+        return payload
+    else:
+        ses_id = rq.cookies.get('session_id')
+        usr_inst = auth.get_user_from_session_id(ses_id)
+
+        if usr_inst is None:
+            abort(403)
+
+        auth.destroy_session(usr_inst.id)
+        return redirect('/')
+
+
+@app.route('/profile', methods=['GET'], strict_slashes=False)
+def profile():
+    """
+        Display user profile payload
+    """
+    ses_id = rq.cookies.get('session_id')
+    user_inst = auth.get_user_from_session_id(ses_id)
+    if user_inst:
+        return jsonify({"email": user_inst.email}), 200
 
 
 if __name__ == "__main__":
