@@ -87,3 +87,30 @@ class Auth:
             or does nothing if user_id is not present in the database
         """
         self._db.update_user(user_id, session_id=None)
+
+    def get_reset_passowrd_token(self, email: str) -> str:
+        """
+            generates a reset password token to change
+            password
+        """
+        try:
+            user = self._db.find_user_by(email=email)
+        except (InvalidRequestError, NoResultFound):
+            raise ValueError
+
+        new_tok = _generate_uuid()
+        self._db.update_user(user.id, reset_token=new_tok)
+        return new_tok
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """
+            updates user password in the db with provided
+            reset_token and new password
+        """
+        try:
+            user = self._db.find_user_by(reset_token=reset_token)
+        except (InvalidRequestError, NoResultFound):
+            raise ValueError
+
+        hash_pas = _hash_password(password).decode('utf-8')
+        self._db.update_user(user.id, hashed_password=hash_pas)
