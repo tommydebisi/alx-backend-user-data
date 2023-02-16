@@ -62,7 +62,10 @@ class DB:
             in kwargs
         """
         # find user by id first
-        user_inst = self.find_user_by(id=user_id)
+        try:
+            user_inst = self.find_user_by(id=user_id)
+        except (InvalidRequestError, NoResultFound):
+            return
 
         for key, val in kwargs.items():
             if list(kwargs.keys())[0] not in list(user_inst.__dict__.keys()):
