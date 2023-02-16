@@ -71,5 +71,5 @@ class DB:
             if list(kwargs.keys())[0] not in list(user_inst.__dict__.keys()):
                 raise ValueError
 
-            user_inst.__dict__[key] = val
+            setattr(user_inst, key, val)
             self.__session.commit()
