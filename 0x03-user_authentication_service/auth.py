@@ -113,4 +113,5 @@ class Auth:
             raise ValueError
 
         hash_pas = _hash_password(password).decode('utf-8')
-        self._db.update_user(user.id, hashed_password=hash_pas)
+        self._db.update_user(user.id, hashed_password=hash_pas,
+                             reset_token=None)
