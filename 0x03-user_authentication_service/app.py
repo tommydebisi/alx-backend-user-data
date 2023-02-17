@@ -2,7 +2,7 @@
 """
     App module
 """
-from flask import Flask, jsonify, request as rq, abort, redirect
+from flask import Flask, jsonify, request, abort, redirect
 from auth import Auth
 
 app = Flask(__name__)
@@ -22,7 +22,7 @@ def reg_user():
     """
         Registers users
     """
-    email, passwd = rq.form.get('email'), rq.form.get('password')
+    email, passwd = request.form.get('email'), request.form.get('password')
 
     try:
         auth.register_user(email, passwd)
@@ -36,8 +36,8 @@ def login():
     """
         Login users
     """
-    if rq.method == 'POST':
-        email, passwd = rq.form.get('email'), rq.form.get('password')
+    if request.method == 'POST':
+        email, passwd = request.form.get('email'), request.form.get('password')
 
         if not auth.valid_login(email, passwd):
             abort(401)
@@ -47,7 +47,7 @@ def login():
         payload.set_cookie('session_id', ses_id)
         return payload
     else:
-        ses_id = rq.cookies.get('session_id')
+        ses_id = request.cookies.get('session_id')
         usr_inst = auth.get_user_from_session_id(ses_id)
 
         if usr_inst is None:
@@ -62,7 +62,7 @@ def profile():
     """
         Display user profile payload
     """
-    ses_id = rq.cookies.get('session_id')
+    ses_id = request.cookies.get('session_id')
     user_inst = auth.get_user_from_session_id(ses_id)
     if user_inst:
         return jsonify({"email": user_inst.email}), 200
@@ -74,7 +74,7 @@ def get_reset_password_token():
         gets the reset password token, from the email provided
         in the form
     """
-    email = rq.form.get('email')
+    email = request.form.get('email')
     try:
         reset_tok = auth.get_reset_passowrd_token(email)
     except ValueError:
@@ -91,8 +91,8 @@ def update_password():
         updates the user password based on email, reset_token
         and new_password from the form
     """
-    email, res_tok = rq.form.get('email'), rq.form.get('reset_token')
-    new_passwd = rq.form.get('new_password')
+    email, res_tok = request.form.get('email'), request.form.get('reset_token')
+    new_passwd = request.form.get('new_password')
 
     try:
         auth.update_password(res_tok, new_passwd)
