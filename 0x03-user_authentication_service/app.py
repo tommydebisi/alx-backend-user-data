@@ -59,7 +59,7 @@ def logout():
         abort(403)
 
     auth.destroy_session(usr_inst.id)
-    return redirect('/')
+    return redirect('/', 301)
 
 
 @app.route('/profile', methods=['GET'], strict_slashes=False)
