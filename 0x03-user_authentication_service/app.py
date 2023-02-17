@@ -36,25 +36,30 @@ def login():
     """
         Login users
     """
-    if request.method == 'POST':
-        email, passwd = request.form.get('email'), request.form.get('password')
+    email, passwd = request.form.get('email'), request.form.get('password')
 
-        if not auth.valid_login(email, passwd):
-            abort(401)
+    if not auth.valid_login(email, passwd):
+        abort(401)
 
-        ses_id = auth.create_session(email)
-        payload = jsonify({"email": email, "message": "logged in"})
-        payload.set_cookie('session_id', ses_id)
-        return payload
-    else:
-        ses_id = request.cookies.get('session_id')
-        usr_inst = auth.get_user_from_session_id(ses_id)
+    ses_id = auth.create_session(email)
+    payload = jsonify({"email": email, "message": "logged in"})
+    payload.set_cookie('session_id', ses_id)
+    return payload
 
-        if usr_inst is None:
-            abort(403)
 
-        auth.destroy_session(usr_inst.id)
-        return redirect('/')
+@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
+def logout():
+    """
+        logs out users
+    """
+    ses_id = request.cookies.get('session_id')
+    usr_inst = auth.get_user_from_session_id(ses_id)
+
+    if usr_inst is None:
+        abort(403)
+
+    auth.destroy_session(usr_inst.id)
+    return redirect('/')
 
 
 @app.route('/profile', methods=['GET'], strict_slashes=False)
@@ -66,6 +71,7 @@ def profile():
     user_inst = auth.get_user_from_session_id(ses_id)
     if user_inst:
         return jsonify({"email": user_inst.email}), 200
+    abort(403)
 
 
 @app.route('/reset_password', methods=['POST'], strict_slashes=False)
