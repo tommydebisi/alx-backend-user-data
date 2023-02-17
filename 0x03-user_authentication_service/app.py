@@ -105,12 +105,8 @@ def update_password():
     except ValueError:
         abort(403)
 
-    # check if email and password can be used to login
-    if auth.valid_login(email, new_passwd):
-        abort(403)
-
     return jsonify({
-        "email": f"{email}",
+        "email": email,
         "message": "Password updated"
     }), 200
 
